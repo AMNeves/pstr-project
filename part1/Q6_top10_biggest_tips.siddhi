@@ -1,0 +1,41 @@
+@App:name("Q6_top10pickup")
+@App:description("Description of the plan")
+ 
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group", 
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+
+define stream RoutesStream300 (carId string, tip_amount double, start_cell_x int, start_cell_y int,  ending_cell_x int, ending_cell_y int);
+
+@sink(type='log', prefix='req') 
+define stream FrequentPickUpStream (start_cell_x int, start_cell_y int,  hallOfFame double);
+
+-- Filter and create 300x300 grid areas
+@info(name='route_query_300')
+from TaxiRidesProductionStream
+select medallion as carId, tip_amount,
+convert( -1*((-74.913585 - pickup_longitude) /  0.005986 ) + 1 , 'int') as start_cell_x,
+convert(((41.474937 - pickup_latitude)/ 0.004491556) + 1 , 'int') as start_cell_y, 
+convert( -1*((-74.913585  - dropoff_longitude) /  0.005986 ) + 1 , 'int') as ending_cell_x,
+convert(((41.474937  - dropoff_latitude)/ 0.004491556) + 1 , 'int') as ending_cell_y
+having (start_cell_x >= 1 and start_cell_x <= 300) and 
+(start_cell_y >= 1 and start_cell_y <= 300) and 
+(ending_cell_y >= 1 and ending_cell_y <= 300) and 
+(ending_cell_x >= 1 and ending_cell_x <= 300)
+insert into RoutesStream300;
+
+-- Find most common pickups 
+@info(name='biggest_tips')
+from RoutesStream300#window.time(30 sec)
+select start_cell_x, start_cell_y, maxForever(tip_amount) as hallOfFame
+group by  start_cell_x, start_cell_y
+insert into FrequentPickUpStream;
+ 

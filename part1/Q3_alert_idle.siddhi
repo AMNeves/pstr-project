@@ -1,0 +1,28 @@
+@App:name("Q3_alert_idle")
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+ 
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",  
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+
+@sink(type='log', prefix='Q3')
+define stream AlertIdleTimeExceededStream(mean_idle_time double);
+
+from every e1 = TaxiRidesProductionStream 
+    -> e2 = TaxiRidesProductionStream[e1.medallion == e2.medallion]
+select time:timestampInMilliseconds(e2.pickup_datetime, 'yyyy-MM-dd HH:mm:ss') - time:timestampInMilliseconds(e1.dropoff_datetime, 'yyyy-MM-dd HH:mm:ss') as difference_in_milliseconds
+insert into TimeBetweenDropsAndPicksStream;
+
+from TimeBetweenDropsAndPicksStream[difference_in_milliseconds >= 0 and difference_in_milliseconds <= 3600000.0]
+select avg(difference_in_milliseconds) as mean_idle_time
+having mean_idle_time > 900000.0
+insert into AlertIdleTimeExceededStream; 

@@ -1,0 +1,50 @@
+@App:name("Q1_top10") 
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+ 
+  
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+
+-- Filter and create 300x300 grid areas
+define stream RoutesStream300 (carId string, start_cell_x int, start_cell_y int,  ending_cell_x int, ending_cell_y int);
+
+define stream FrequentRoutesStream (ending_cell_x int, ending_cell_y int, start_cell_x int, start_cell_y int,  nTrips long);
+
+@sink(type='log', prefix='Q1')
+define stream Top10RoutesStream (ending_cell_x int, ending_cell_y int, start_cell_x int, start_cell_y int,  nTrips long);
+
+-- Filter and create 300x300 grid areas
+@info(name='route_query_300')
+from TaxiRidesProductionStream
+select medallion as carId, 
+convert( -1*((-74.913585 - pickup_longitude) /  0.005986 ) + 1 , 'int') as start_cell_x,
+convert(((41.474937 - pickup_latitude)/ 0.004491556) + 1 , 'int') as start_cell_y, 
+convert( -1*((-74.913585  - dropoff_longitude) /  0.005986 ) + 1 , 'int') as ending_cell_x,
+convert(((41.474937  - dropoff_latitude)/ 0.004491556) + 1 , 'int') as ending_cell_y
+having (start_cell_x >= 1 and start_cell_x <= 300) and 
+(start_cell_y >= 1 and start_cell_y <= 300) and 
+(ending_cell_y >= 1 and ending_cell_y <= 300) and 
+(ending_cell_x >= 1 and ending_cell_x <= 300)
+insert into RoutesStream300; 
+
+-- Find most common routes
+@info(name='common_routes')
+from RoutesStream300#window.time(30 sec)
+select ending_cell_x, ending_cell_y,  start_cell_x, start_cell_y, count(carId) as nTrips
+group by  ending_cell_x, ending_cell_y, start_cell_x, start_cell_y
+insert into FrequentRoutesStream;
+
+-- Get top 10 routes descending order by number of trips
+@info(name='top10_routes')
+from FrequentRoutesStream#window.sort(10, nTrips, 'desc')
+select ending_cell_x, ending_cell_y,  start_cell_x, start_cell_y, nTrips
+insert into Top10RoutesStream;

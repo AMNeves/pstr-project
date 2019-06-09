@@ -1,0 +1,46 @@
+
+@App:name("Q7_detect_weird_tips")
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, 
+                                            hack_license string, 
+                                            pickup_datetime string, 
+                                            dropoff_datetime string, 
+                                            trip_time_in_secs double, 
+                                            trip_distance double, 
+                                            pickup_longitude double, 
+                                            pickup_latitude double, 
+                                            dropoff_longitude double, 
+                                            dropoff_latitude double, 
+                                            payment_type string, 
+                                            fare_amount double, 
+                                            surcharge double, 
+                                            mta_tax double, 
+                                            tip_amount double,  
+                                            tolls_amount double, 
+                                            total_amount double);
+
+define stream TipRegression (medallion string, stderr double, beta0 double, beta1 double, beta2 double, beta3 double, trip_time_in_secs double, trip_distance double, fare_amount double) ;
+
+@sink(type='log', prefix='Tip forecast:')
+define stream TipForecast (medallion string, forecast double) ;
+ 
+from TaxiRidesProductionStream#timeseries:regress(15, 25000, 0.95, tip_amount, trip_time_in_secs, trip_distance, fare_amount)
+select medallion, stderr, beta0, beta1, beta2, beta3, trip_time_in_secs, trip_distance, fare_amount
+insert into TipRegression;
+
+from TipRegression#window.time(30 sec)
+select medallion, (beta0 + beta1*trip_time_in_secs + beta2*trip_distance + beta3*fare_amount + stderr) as forecast
+insert into TipForecast;
+
+

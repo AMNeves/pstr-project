@@ -1,0 +1,1 @@
+docker run -it -p 9390:9390 -p 9743:9743 -p 8280:8280 -p 9092:9092 --name kafka andrelopes/my-first-repo:wso2-kafka

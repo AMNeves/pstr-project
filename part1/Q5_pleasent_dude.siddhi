@@ -1,0 +1,34 @@
+@App:name("Q5_pleasent_dude")
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+
+
+define stream DailyTipsStream(carId string, dailyTips double);
+
+@sink(type='log', prefix='Q5')
+define stream PleasentTaxiDudeStream(carId string, dailyTips double);
+ 
+-- Create drivers daily tips sum w 24h tumble window
+@info(name='daily_tips')
+from TaxiRidesProductionStream#window.timeBatch(24 min)
+select medallion as carId, sum(tip_amount) as dailyTips
+group by medallion   
+insert into DailyTipsStream; 
+
+-- Alert most pleasent taxi driver, this should keep the highest dude.
+@info(name='most_pleasent_query')
+from DailyTipsStream#window.sort(1, dailyTips, 'desc')
+select carId, dailyTips
+insert into PleasentTaxiDudeStream;
+

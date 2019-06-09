@@ -1,0 +1,85 @@
+@App:name("Q2_most_profit") 
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+
+define stream RoutesStream600 (carId string, fare double, tip double, tripTime double, pickup_datetime string, dropoff_datetime string, start_cell_x int, start_cell_y int,  ending_cell_x int, ending_cell_y int);
+
+define stream FinalRoutesStream600 (carId string, fare double, tip double, start_cell_x int, start_cell_y int,  ending_cell_x int, ending_cell_y int);
+
+define stream AreaProfitStream (cell_x int, cell_y int,  profit double);
+
+define stream EmptyTaxisStream (cell_x int, cell_y int,  emptyTaxis long);
+
+@sink(type='log', prefix='Q2')
+define stream AreaProfitabilityStream (cell_x int, cell_y int,  profitability double);
+
+-- Filter and create 600x600 grid areas
+@info(name='route_query_600')
+from TaxiRidesProductionStream
+select medallion as carId, fare_amount as fare, tip_amount as tip, trip_time_in_secs as tripTime, pickup_datetime, dropoff_datetime,
+convert( -1*((-74.913585 - pickup_longitude) /  (0.005986/2) ) + 1 , 'int') as start_cell_x,
+convert(((41.474937 - pickup_latitude)/ (0.004491556/2)) + 1 , 'int') as start_cell_y, 
+convert( -1*((-74.913585  - dropoff_longitude) /  (0.005986/2) ) + 1 , 'int') as ending_cell_x,
+convert(((41.474937  - dropoff_latitude)/ (0.004491556/2)) + 1 , 'int') as ending_cell_y
+having (start_cell_x >= 1 and start_cell_x <= 600) and 
+(start_cell_y >= 1 and start_cell_y <= 600) and 
+(ending_cell_y >= 1 and ending_cell_y <= 600) and 
+(ending_cell_x >= 1 and ending_cell_x <= 600)
+insert into RoutesStream600;
+
+
+-- Filter taxis with no starting trips in a 15 minute window
+--@info(name='ending_routes_profit')
+--from every e1 = RoutesStream600 
+--   -> not RoutesStream600[e1.carId == carId and e1.ending_cell_x == start_cell_x andending_cell_y == start_cell_y] for 15 min
+--select e1.carId as carId,  e1.fare as fare, e1.tip as tip, e1.start_cell_x, e1.start_cell_y,  e1.ending_cell_x, e1.ending_cell_y
+--insert into FinalRoutesStream600;
+
+
+@info(name='time_between_dropoffs') 
+from every e1 = RoutesStream600 
+    -> e2 = RoutesStream600[e1.carId == e2.carId]
+select e1.carId, e1.fare, e1.tip, e1.start_cell_x, e1.start_cell_y,  e1.ending_cell_x, e1.ending_cell_y, 
+time:timestampInMilliseconds(e2.pickup_datetime, 'yyyy-MM-dd HH:mm:ss') - time:timestampInMilliseconds(e1.dropoff_datetime, 'yyyy-MM-dd HH:mm:ss') as difference_in_milliseconds
+insert into TimeBetweenDropsAndPicksStream;
+
+-- Filter taxis with no starting trips in a 15 minute window
+@info(name='ending_routes_profit') 
+from TimeBetweenDropsAndPicksStream[difference_in_milliseconds > 900000]
+select carId as carId,  fare as fare, tip as tip, start_cell_x, e1.start_cell_y,  ending_cell_x, ending_cell_y
+insert into FinalRoutesStream600;
+
+-- Count area profit by starting trip
+@info(name='area_profit')
+from RoutesStream600[tripTime <= (15*60)]
+select start_cell_x as cell_x, start_cell_y as cell_y, avg(fare + tip) as profit
+group by  start_cell_x, start_cell_y 
+insert into AreaProfitStream;
+ 
+ 
+-- Count area empty taxis by ending trip trip
+@info(name='empty_taxis')
+from FinalRoutesStream600#window.time(30 sec)
+select ending_cell_x as cell_x, ending_cell_y as cell_y, count(carId) as emptyTaxis
+group by  ending_cell_x, ending_cell_y
+insert into EmptyTaxisStream;
+
+
+-- Join both streams to calculate profitability from empty taxis and area profit
+from AreaProfitStream#window.time(15 sec) as A
+join EmptyTaxisStream#window.time(15 sec) as E
+on A.cell_x == E.cell_x and A.cell_y == E.cell_y
+select A.cell_x, A.cell_y, (A.profit / E.emptyTaxis) as profitability
+insert into AreaProfitabilityStream;
+

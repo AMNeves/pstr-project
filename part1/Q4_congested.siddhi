@@ -1,0 +1,43 @@
+@App:name("Q4_congested")
+@App:description("Description of the plan")
+
+-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. 
+
+
+@source( type='kafka',
+         topic.list='debs',
+         partition.no.list='0',
+         threading.option='single.thread',
+         group.id="group",
+         bootstrap.servers='localhost:9092',
+         @map(type='csv') )
+--@info(name = 'input stream') 
+define stream TaxiRidesProductionStream (medallion string, hack_license string, pickup_datetime string, dropoff_datetime string, trip_time_in_secs double, trip_distance double, pickup_longitude double, pickup_latitude double, dropoff_longitude double, dropoff_latitude double, payment_type string, fare_amount double, surcharge double, mta_tax double, tip_amount double, tolls_amount double, total_amount double);
+ 
+
+-- Filter and create 300x300 grid areas
+define stream RoutesStream300 (carId string, duration double, start_cell_x int, start_cell_y int,  ending_cell_x int, ending_cell_y int);
+
+@sink(type='log', prefix='Q4')
+define stream CongestedAreasStream (start_cell_x int, start_cell_y int);
+
+-- Filter and create 300x300 grid areas
+@info(name='route_query_300')
+from TaxiRidesProductionStream
+select medallion as carId, trip_time_in_secs as duration,
+convert( -1*((-74.913585 - pickup_longitude) /  0.005986 ) + 1 , 'int') as start_cell_x,
+convert(((41.474937 - pickup_latitude)/ 0.004491556) + 1 , 'int') as start_cell_y, 
+convert( -1*((-74.913585  - dropoff_longitude) /  0.005986 ) + 1 , 'int') as ending_cell_x,
+convert(((41.474937  - dropoff_latitude)/ 0.004491556) + 1 , 'int') as ending_cell_y
+having (start_cell_x >= 1 and start_cell_x <= 300) and 
+(start_cell_y >= 1 and start_cell_y <= 300) and 
+(ending_cell_y >= 1 and ending_cell_y <= 300) and 
+(ending_cell_x >= 1 and ending_cell_x <= 300)
+insert into RoutesStream300;
+
+from every e1 = RoutesStream300
+    -> e2 = RoutesStream300[e1.carId == e2.carId and e1.duration < e2.duration]
+    -> e3 = RoutesStream300[e3.carId == e2.carId and e2.duration < e3.duration]
+    -> e4 = RoutesStream300[e4.carId == e3.carId and e3.duration < e4.duration]
+select e1.start_cell_x, e1.start_cell_y
+insert into CongestedAreasStream;
