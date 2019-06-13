@@ -19,11 +19,16 @@
 package ps2019;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
+
+import java.util.Properties;
+
 /**
  * Skeleton for a Flink Streaming Job.
  *
@@ -41,7 +46,7 @@ import org.apache.flink.util.Collector;
  * main(String[] args)) method, change the respective entry in the POM.xml file
  * (simply search for 'mainClass').
  */
-public class WindowWordCount
+public class KafkaConsumer
 {
 	public static void main(String[] args) throws Exception {
 
@@ -53,27 +58,24 @@ public class WindowWordCount
 
 		// make parameters available in the web interface
 		env.getConfig().setGlobalJobParameters(params);
+		Properties properties = new Properties();
+		properties.setProperty("bootstrap.servers", "localhost:9092");
 
-		// get input data
-		DataStream<String> text;
-		if (params.has("input")) {
-			// read the text file from given input path
-			text = env.readTextFile(params.get("input"));
-		} else {
-			System.out.println("Executing WordCount example with default input data set.");
-			System.out.println("Use --input to specify file input.");
-			// get default test text data
-			text = env.fromElements(WordCountData.WORDS);
-		}
+		// only required for Kafka 0.8
+		// properties.setProperty("zookeeper.connect", "localhost:2181");
+		properties.setProperty("group.id", "local[2]");
 
-		DataStream<Tuple2<String, Integer>> counts =
+		DataStream<String> text = env
+				.addSource(new FlinkKafkaConsumer<>("debs", new SimpleStringSchema(), properties));
+
+		//DataStream<Tuple2<String, Integer>> counts =
 				// split up the lines in pairs (2-tuples) containing: (word,1)
-				text.flatMap(new Tokenizer())
+			//	text.flatMap(new Tokenizer())
 						// group by the tuple field "0" and sum up tuple field
 						// "1"
-						.keyBy(0).sum(1);
+						//.keyBy(0).sum(1);
 
-		counts.writeAsText( "log/result.txt");
+		text.writeAsText( "log/result.txt");
 		
 		// execute program
 		env.execute("Streaming WordCount");
