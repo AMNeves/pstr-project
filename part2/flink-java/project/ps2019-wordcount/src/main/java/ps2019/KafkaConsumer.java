@@ -18,16 +18,33 @@
 
 package ps2019;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.cep.CEP;
+import org.apache.flink.cep.PatternStream;
+import org.apache.flink.cep.functions.PatternProcessFunction;
+import org.apache.flink.cep.pattern.Pattern;
+import org.apache.flink.cep.pattern.conditions.SimpleCondition;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -48,6 +65,161 @@ import java.util.Properties;
  */
 public class KafkaConsumer
 {
+	private static SingleOutputStreamOperator<Tuple2<String, Double>> reduceKeyDouble(SingleOutputStreamOperator<Tuple2<String, Double>> routesQ6) {
+		KeyedStream<Tuple2<String, Double>, String> keyedRoutesQ6 = routesQ6.keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0);
+		SingleOutputStreamOperator<Tuple2<String, Double>> reduced = keyedRoutesQ6.reduce(
+				(ReduceFunction<Tuple2<String, Double>>) (value1, value2) ->
+						new Tuple2<String, Double>(value1.f0, value1.f1 + value2.f1));
+		return reduced;
+	}
+
+	private static DataStream<String> idleTaxisQ3(DataStream<TaxiTrip> consumer){
+
+		// Q3 - idle taxis
+		KeyedStream<TaxiTrip, String> TaxiStreamKeyed = consumer.keyBy((KeySelector<TaxiTrip, String>) value -> value.medallion);
+		// Pattern e1 -> e2 withing 1 hour
+		Pattern<TaxiTrip, ?> patternQ3 = Pattern.<TaxiTrip>begin("start").followedBy("end").within(Time.hours(1));
+
+		PatternStream<TaxiTrip> patternStreamKeyedQ3 = CEP.pattern(TaxiStreamKeyed, patternQ3);
+
+		//Pattern  e1 -> e2 - e1 car = e2 car - withing 1 hour
+		SingleOutputStreamOperator<Tuple2<String, Long>> idleTimes = patternStreamKeyedQ3.process(new PatternProcessFunction<TaxiTrip, Tuple2<String, Long>>() {
+			@Override
+			public void processMatch(Map<String
+					, List<TaxiTrip>> map
+					, Context context
+					, Collector<Tuple2<String, Long>> collector) {
+
+				TaxiTrip start = map.get("start").get(0);
+				TaxiTrip end = map.get("end").get(0);
+				if (start.medallion.equals(end.medallion)) { // Make sure start and end are the same car
+					collector.collect(new Tuple2<String, Long>(start.medallion, end.dropoff_datetime.getTime() - start.dropoff_datetime.getTime()));
+				}
+			}
+		}).name("Pattern E1 -> E2 same medallion");
+
+		KeyedStream<Tuple2<String, Long>, String> keyedIdleTimes = idleTimes.keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0);
+
+		SingleOutputStreamOperator<Tuple2<String, Long>> idleTimesTotal = keyedIdleTimes.sum(1).name("Idle time total reduce");
+
+		Pattern<Tuple2<String, Long>, ?> patternAlert = Pattern.<Tuple2<String, Long>>begin("start").where(
+				new SimpleCondition<Tuple2<String, Long>>() {
+					@Override
+					public boolean filter(Tuple2<String, Long> event) {
+						return event.f1 >= Time.minutes(10).toMilliseconds();
+					}
+				}
+		);
+		PatternStream<Tuple2<String, Long>> idlePatterned = CEP.pattern(idleTimesTotal, patternAlert);
+
+		DataStream<String> idleAlerts = idlePatterned.process(
+				new PatternProcessFunction<Tuple2<String, Long>, String>() {
+					@Override
+					public void processMatch(
+							Map<String, List<Tuple2<String, Long>>> pattern,
+							Context ctx,
+							Collector<String> out) {
+						out.collect("ALERT TIME IDLE BIGGER THAN 10 MINUTES IN THE LAST HOUR");
+					}
+				}).name("10 minutes alert collector");
+
+		return idleAlerts;
+	}
+
+	private static SingleOutputStreamOperator<LinkedHashMap<String, Integer>> top10Routes(DataStream<TaxiTrip> consumer){
+
+		// Q1 - Top 10 frequent routes during 30 mins
+		DataStream<TaxiTrip> q2Gridded = consumer.map(new GridMap300());
+
+		SingleOutputStreamOperator<Tuple2<String, Integer>> routesQ2 = q2Gridded.map(new MapFunction<TaxiTrip, Tuple2<String, Integer>> () {
+				@Override
+				public Tuple2<String, Integer> map(TaxiTrip value)  {
+					return new Tuple2<String, Integer>(Double.toString(value.pickup_latitude) + value.pickup_longitude + value.dropoff_latitude + value.dropoff_longitude, 1);
+				}
+		}).name("Map trips per route unique ID");
+
+
+		KeyedStream<Tuple2<String, Integer>, String> keyedRoutesQ2 = routesQ2.keyBy((KeySelector<Tuple2<String, Integer>, String>) value -> value.f0 );
+
+		SingleOutputStreamOperator<Tuple2<String, Integer>> reducedRoutesQ2 = keyedRoutesQ2.reduce(
+				(ReduceFunction<Tuple2<String, Integer>>) (value1, value2) ->
+						new Tuple2<String, Integer>(value1.f0, value1.f1 + value2.f1)).name("Reduce trips by route -> Sliding window (30 m, 5s)");
+
+		//sliding window that slides each 5 minutes and aggregates last 30 minutes of data, 5 seconds due to flink's limitations
+		WindowedStream<Tuple2<String, Integer>, String, TimeWindow> keyedReducedRoutesQ2 = reducedRoutesQ2.keyBy((KeySelector<Tuple2<String, Integer>, String>) value -> value.f0)
+				.window(SlidingEventTimeWindows.of(Time.minutes(30), Time.seconds(5)));
+
+		SingleOutputStreamOperator<LinkedHashMap<String, Integer>> top10Routes = keyedReducedRoutesQ2.process(
+				new ProcessWindowFunction<Tuple2<String, Integer>, LinkedHashMap<String, Integer>, String, TimeWindow>(){
+
+					@Override
+					public void process(String key, Context context, Iterable<Tuple2<String, Integer>> input, Collector<LinkedHashMap<String, Integer>> out) {
+						TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>();
+
+						for (Tuple2<String, Integer> t: input) {
+							int count = 0;
+							if (sortedMap.containsKey(t.f0)) count = sortedMap.get(t.f0);
+							sortedMap.put(t.f0, count + t.f1);
+						}
+
+						LinkedHashMap<String, Integer> sortedTopN = sortedMap
+								.entrySet()
+								.stream()
+								.limit(10)
+								.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+
+						out.collect(sortedTopN);
+					}
+				}).name("Top 10 sorted routes collector");
+		return top10Routes;
+	}
+
+	private static SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute(DataStream<TaxiTrip> consumer){
+		DataStream<TaxiTrip> q6Gridded = consumer.map(new GridMap300());
+
+		SingleOutputStreamOperator<Tuple2<String, Double>> routesQ6 = q6Gridded.map(new MapFunction<TaxiTrip, Tuple2<String, Double>> () {
+			@Override
+			public Tuple2<String, Double> map(TaxiTrip value)  {
+				return new Tuple2<String, Double>(Double.toString(value.pickup_latitude) + value.pickup_longitude + value.dropoff_latitude + value.dropoff_longitude, value.tip_amount);
+			}
+		}).name("Map route tips per unique ID");
+		SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute = reduceKeyDouble(routesQ6).name("Reduce tips per route");
+
+		return tipsPerRoute;
+	}
+
+	private static SingleOutputStreamOperator<Tuple2<String, Double>> mostPleasentDriver(DataStream<TaxiTrip> consumer){
+
+		// Q5 - Select most pleasant taxi driver
+		SingleOutputStreamOperator<Tuple2<String, Double>> driverTips = consumer.map(new MapFunction<TaxiTrip, Tuple2<String, Double>> () {
+			@Override
+			public Tuple2<String, Double> map(TaxiTrip value)  {
+				return new Tuple2<String, Double>(value.medallion, value.tip_amount);
+			}
+		}).name("Map tips by driver");
+
+		WindowedStream<Tuple2<String, Double>, String, TimeWindow> keyedReducedDriverTips = reduceKeyDouble(driverTips).name("Reduce tips by driver once a day").keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0)
+				.window(TumblingEventTimeWindows.of(Time.days(1)));
+
+		SingleOutputStreamOperator<Tuple2<String, Double>> bestDriver = keyedReducedDriverTips.process(
+				new ProcessWindowFunction<Tuple2<String, Double>, Tuple2<String, Double>, String, TimeWindow>(){
+
+					@Override
+					public void process(String key, Context context, Iterable<Tuple2<String, Double>> input, Collector<Tuple2<String, Double>> out) {
+
+						Tuple2<String, Double> topDriver = new Tuple2<String, Double>("placeolder", Double.NEGATIVE_INFINITY);
+
+						for (Tuple2<String, Double> t: input) {
+							if(t.f1 >= topDriver.f1){
+								topDriver = t;
+							}
+						}
+
+						out.collect(topDriver);
+					}
+				}).name("Top driver collector");
+		return bestDriver;
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -59,60 +231,49 @@ public class KafkaConsumer
 
 		// make parameters available in the web interface
 		env.getConfig().setGlobalJobParameters(params);
+
+		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+
 		Properties properties = new Properties();
 		properties.setProperty("bootstrap.servers", "localhost:9092");
-		properties.setProperty("group.id", "local[2]");
+		properties.setProperty("group.id", "p2");
 
-		DataStream<TaxiTrip> text = env
+		// Kafka consumer with event time and watermark of 30 seconds
+		DataStream<TaxiTrip> consumer = env
 				.addSource(new FlinkKafkaConsumer<>("debs", new DebsSchema(), properties));
+		consumer.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<TaxiTrip>(Time.seconds(30)) {
 
-		DataStream<TaxiTrip> trips = text.map(new MapTokenizer());
+								   @Override
+								   public long extractTimestamp(TaxiTrip element) {
+									   return element.dropoff_datetime.getTime();
+								   }
+		}).name("Kafka taxi trip consumer");
 
-		trips.writeAsText( "log/result.txt");
-		
+
+		// Q3 - Alert idle taxis when greater then 10 minutes
+		idleTaxisQ3(consumer).writeAsText("log/q3_idle_alerts.txt", FileSystem.WriteMode.OVERWRITE).name("Q3 - Idle time alerts");
+
+		// Q1 - Top 10 frequent routes during 30 minutes - Extra query for CEP purposes
+		top10Routes(consumer).writeAsText( "log/q1_most_frequent.txt", FileSystem.WriteMode.OVERWRITE).name("Q1 - Top 10 frequent routes");
+
+		// Q6 - tips hall of fame
+		tipsPerRoute(consumer).writeAsText( "log/q6_route_tips.txt", FileSystem.WriteMode.OVERWRITE).name("Q6 - Tips hall of fame");
+
+		// Q5 - most pleasant driver
+		mostPleasentDriver(consumer).writeAsText( "log/q5_pleasantDriver.txt", FileSystem.WriteMode.OVERWRITE).name("Q5 - Most pleasant driver");
+
 		// execute program
-		env.execute("Streaming WordCount");
+		env.execute("Streaming Taxi Trips");
 	}
 
 	// *************************************************************************
 	// USER FUNCTIONS
 	// *************************************************************************
 
-	/**
-	 * Implements the string tokenizer that splits sentences into words as a
-	 * user-defined FlatMapFunction. The function takes a line (String) and
-	 * splits it into multiple pairs in the form of "(pepi,1)"
-	 * ({@code Tuple2<String,
-	 * Integer>}).
-	 */
-	public static final class Tokenizer implements FlatMapFunction<String, Tuple2<String, Integer>>
-	{
-
-		@Override
-		public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
-			// normalize and split the line
-			String[] tokens = value.toLowerCase().split(",");
-			//chose stuff
-			// emit the pairs
-			for (String token : tokens) {
-				if (token.length() > 0) {
-					out.collect(new Tuple2<>(token, 1));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Implements the string tokenizer that splits sentences into words as a
-	 * user-defined FlatMapFunction. The function takes a line (String) and
-	 * splits it into multiple pairs in the form of "(word,1)"
-	 * ({@code Tuple2<String,
-	 * Integer>}).
-	 */
-	public static final class MapTokenizer implements MapFunction<TaxiTrip, TaxiTrip>
+	public static final class GridMap300 implements MapFunction<TaxiTrip, TaxiTrip>
 	{
 		@Override
-		public TaxiTrip map(TaxiTrip value) throws Exception {
+		public TaxiTrip map(TaxiTrip value)  {
 			value.pickup_longitude =  (int) (-1*((-74.913585 - value.pickup_longitude) / 0.005986 ) + 1);
 			value.pickup_latitude =  (int) (((41.474937 - value.pickup_latitude)/ 0.004491556) + 1);
 			value.dropoff_longitude = (int)  (-1*((-74.913585 - value.dropoff_longitude) / 0.005986 ) + 1 );

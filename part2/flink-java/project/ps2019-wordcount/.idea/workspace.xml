@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="49daaf4e-e351-49d1-ac54-79ee47ffc2bf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ps2019-wordcount (1).iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ps2019/DebsSchema.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="789d2c71-6406-4319-81dd-76b88c5f4d1b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../image/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../image/log/result.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ps2019-wordcount.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../kafka/TP2-18-19.pdf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -34,28 +35,40 @@
     <select />
   </component>
   <component name="DefaultGradleProjectSettings">
-    <option name="testRunner" value="GRADLE" />
-    <option name="delegatedBuild" value="true" />
+    <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="358">
-              <caret line="68" column="35" selection-start-line="68" selection-start-column="35" selection-end-line="68" selection-end-column="35" />
+            <state relative-caret-position="348">
+              <caret line="128" column="120" selection-start-line="128" selection-start-column="120" selection-end-line="128" selection-end-column="120" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
+                <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
+                <element signature="e#3216#3226#0" expanded="true" />
+                <element signature="e#4122#4669#0" expanded="true" />
+                <element signature="e#4668#4669#0" expanded="true" />
+                <element signature="e#4288#4310#0" expanded="true" />
+                <element signature="e#4947#5137#0" expanded="true" />
+                <element signature="e#5136#5137#0" expanded="true" />
+                <element signature="e#5438#5743#0" expanded="true" />
+                <element signature="e#5742#5743#0" expanded="true" />
+                <element signature="method#idleTaxisQ3#1;class#KafkaConsumer#0" />
+                <element signature="e#7113#7899#0" expanded="true" />
+                <element signature="e#7294#7311#0" expanded="true" />
+                <element signature="e#7898#7899#0" expanded="true" />
+                <element signature="method#idleTaxisQ3#2;class#KafkaConsumer#0" />
+                <element signature="method#top10Routes#1;class#KafkaConsumer#0" />
+                <element signature="e#9647#10168#0" expanded="true" />
+                <element signature="e#9476#9492#0" expanded="true" />
+                <element signature="e#10167#10168#0" expanded="true" />
+                <element signature="method#main#0;class#KafkaConsumer#0" />
+                <element signature="e#3077#3078#0" expanded="true" />
+                <element signature="e#3144#3145#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="73" column="22" selection-start-line="73" selection-start-column="22" selection-end-line="73" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -77,6 +90,10 @@
       <find>fload</find>
       <find>float</find>
       <find>kafka</find>
+      <find>&lt;&gt;</find>
+      <find>OP1:</find>
+      <find>find</find>
+      <find>window</find>
     </findStrings>
     <replaceStrings>
       <replace>&quot;</replace>
@@ -91,8 +108,8 @@
       <list>
         <option value="$PROJECT_DIR$/src/main/java/ps2019/DebsSchema.java" />
         <option value="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" />
       </list>
     </option>
   </component>
@@ -138,7 +155,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -147,43 +163,11 @@
               <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
               <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ps2019" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -215,43 +199,44 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="49daaf4e-e351-49d1-ac54-79ee47ffc2bf" name="Default Changelist" comment="" />
+      <changelist id="789d2c71-6406-4319-81dd-76b88c5f4d1b" name="Default Changelist" comment="" />
       <created>1560511576265</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1560511576265</updated>
       <workItem from="1560511579540" duration="5072000" />
+      <workItem from="1560689540923" duration="16406000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5072000" />
+    <option name="totallyTimeSpent" value="21760000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1513" height="973" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="Designer" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18075602" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.0554371" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.28706998" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.18959913" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Maven" weight="0.3298969" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info anchor="right" id="Database" weight="0.3298969" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.24948454" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="3" visible="true" weight="0.16950959" />
+      <window_info anchor="right" id="Palette&#9;" order="4" />
+      <window_info anchor="right" id="Database" order="5" weight="0.3298969" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -273,18 +258,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/DebsSchema.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="65" selection-start-line="9" selection-start-column="57" selection-end-line="9" selection-end-column="65" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#606#607#0" expanded="true" />
-            <element signature="e#668#669#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/log4j.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
@@ -292,29 +265,81 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java">
+    <entry file="file://$PROJECT_DIR$/dependency-reduced-pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ps2019-wordcount (1).iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="952">
-          <caret line="62" column="54" selection-start-line="62" selection-start-column="54" selection-end-line="62" selection-end-column="54" />
+        <state relative-caret-position="-13">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/DebsSchema.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="19" column="9" lean-forward="true" selection-start-line="19" selection-start-column="9" selection-end-line="19" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="73" column="22" selection-start-line="73" selection-start-column="22" selection-end-line="73" selection-end-column="22" />
+        <state relative-caret-position="153">
+          <caret line="9" column="31" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="31" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-core/1.8.0/flink-core-1.8.0-sources.jar!/org/apache/flink/api/common/functions/ReduceFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="650">
+          <caret line="61" column="6" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-streaming-java_2.11/1.8.0/flink-streaming-java_2.11-1.8.0-sources.jar!/org/apache/flink/streaming/api/datastream/DataStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="1041" column="29" selection-start-line="1041" selection-start-column="29" selection-end-line="1041" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="358">
-          <caret line="68" column="35" selection-start-line="68" selection-start-column="35" selection-end-line="68" selection-end-column="35" />
+        <state relative-caret-position="348">
+          <caret line="128" column="120" selection-start-line="128" selection-start-column="120" selection-end-line="128" selection-end-column="120" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
+            <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
+            <element signature="e#3216#3226#0" expanded="true" />
+            <element signature="e#4122#4669#0" expanded="true" />
+            <element signature="e#4668#4669#0" expanded="true" />
+            <element signature="e#4288#4310#0" expanded="true" />
+            <element signature="e#4947#5137#0" expanded="true" />
+            <element signature="e#5136#5137#0" expanded="true" />
+            <element signature="e#5438#5743#0" expanded="true" />
+            <element signature="e#5742#5743#0" expanded="true" />
+            <element signature="method#idleTaxisQ3#1;class#KafkaConsumer#0" />
+            <element signature="e#7113#7899#0" expanded="true" />
+            <element signature="e#7294#7311#0" expanded="true" />
+            <element signature="e#7898#7899#0" expanded="true" />
+            <element signature="method#idleTaxisQ3#2;class#KafkaConsumer#0" />
+            <element signature="method#top10Routes#1;class#KafkaConsumer#0" />
+            <element signature="e#9647#10168#0" expanded="true" />
+            <element signature="e#9476#9492#0" expanded="true" />
+            <element signature="e#10167#10168#0" expanded="true" />
+            <element signature="method#main#0;class#KafkaConsumer#0" />
+            <element signature="e#3077#3078#0" expanded="true" />
+            <element signature="e#3144#3145#0" expanded="true" />
           </folding>
         </state>
       </provider>
