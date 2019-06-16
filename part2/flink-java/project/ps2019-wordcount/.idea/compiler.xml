@@ -6,13 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ps2019-wordcount (1)" />
         <module name="ps2019-wordcount" />
-        <module name="maven-archiver" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ps2019-wordcount (2)" target="1.8" />
+      <module name="ps2019-wordcount (1)" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

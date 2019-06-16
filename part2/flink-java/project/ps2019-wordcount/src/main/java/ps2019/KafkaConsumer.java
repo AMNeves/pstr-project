@@ -67,10 +67,9 @@ public class KafkaConsumer
 {
 	private static SingleOutputStreamOperator<Tuple2<String, Double>> reduceKeyDouble(SingleOutputStreamOperator<Tuple2<String, Double>> routesQ6) {
 		KeyedStream<Tuple2<String, Double>, String> keyedRoutesQ6 = routesQ6.keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0);
-		SingleOutputStreamOperator<Tuple2<String, Double>> reduced = keyedRoutesQ6.reduce(
+		return keyedRoutesQ6.reduce(
 				(ReduceFunction<Tuple2<String, Double>>) (value1, value2) ->
 						new Tuple2<String, Double>(value1.f0, value1.f1 + value2.f1));
-		return reduced;
 	}
 
 	private static DataStream<String> idleTaxisQ3(DataStream<TaxiTrip> consumer){
@@ -112,7 +111,7 @@ public class KafkaConsumer
 		);
 		PatternStream<Tuple2<String, Long>> idlePatterned = CEP.pattern(idleTimesTotal, patternAlert);
 
-		DataStream<String> idleAlerts = idlePatterned.process(
+		return idlePatterned.process(
 				new PatternProcessFunction<Tuple2<String, Long>, String>() {
 					@Override
 					public void processMatch(
@@ -122,8 +121,6 @@ public class KafkaConsumer
 						out.collect("ALERT TIME IDLE BIGGER THAN 10 MINUTES IN THE LAST HOUR");
 					}
 				}).name("10 minutes alert collector");
-
-		return idleAlerts;
 	}
 
 	private static SingleOutputStreamOperator<LinkedHashMap<String, Integer>> top10Routes(DataStream<TaxiTrip> consumer){
@@ -149,7 +146,7 @@ public class KafkaConsumer
 		WindowedStream<Tuple2<String, Integer>, String, TimeWindow> keyedReducedRoutesQ2 = reducedRoutesQ2.keyBy((KeySelector<Tuple2<String, Integer>, String>) value -> value.f0)
 				.window(SlidingEventTimeWindows.of(Time.minutes(30), Time.seconds(5)));
 
-		SingleOutputStreamOperator<LinkedHashMap<String, Integer>> top10Routes = keyedReducedRoutesQ2.process(
+		return keyedReducedRoutesQ2.process(
 				new ProcessWindowFunction<Tuple2<String, Integer>, LinkedHashMap<String, Integer>, String, TimeWindow>(){
 
 					@Override
@@ -171,7 +168,6 @@ public class KafkaConsumer
 						out.collect(sortedTopN);
 					}
 				}).name("Top 10 sorted routes collector");
-		return top10Routes;
 	}
 
 	private static SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute(DataStream<TaxiTrip> consumer){
@@ -183,9 +179,8 @@ public class KafkaConsumer
 				return new Tuple2<String, Double>(Double.toString(value.pickup_latitude) + value.pickup_longitude + value.dropoff_latitude + value.dropoff_longitude, value.tip_amount);
 			}
 		}).name("Map route tips per unique ID");
-		SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute = reduceKeyDouble(routesQ6).name("Reduce tips per route");
 
-		return tipsPerRoute;
+		return reduceKeyDouble(routesQ6).name("Reduce tips per route");
 	}
 
 	private static SingleOutputStreamOperator<Tuple2<String, Double>> mostPleasentDriver(DataStream<TaxiTrip> consumer){
@@ -198,10 +193,10 @@ public class KafkaConsumer
 			}
 		}).name("Map tips by driver");
 
-		WindowedStream<Tuple2<String, Double>, String, TimeWindow> keyedReducedDriverTips = reduceKeyDouble(driverTips).name("Reduce tips by driver once a day").keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0)
+		WindowedStream<Tuple2<String, Double>, String, TimeWindow> keyedReducedDriverTips = reduceKeyDouble(driverTips).name("Reduce tips by driver - window 24h").keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0)
 				.window(TumblingEventTimeWindows.of(Time.days(1)));
 
-		SingleOutputStreamOperator<Tuple2<String, Double>> bestDriver = keyedReducedDriverTips.process(
+		return keyedReducedDriverTips.process(
 				new ProcessWindowFunction<Tuple2<String, Double>, Tuple2<String, Double>, String, TimeWindow>(){
 
 					@Override
@@ -218,7 +213,6 @@ public class KafkaConsumer
 						out.collect(topDriver);
 					}
 				}).name("Top driver collector");
-		return bestDriver;
 	}
 
 	public static void main(String[] args) throws Exception {

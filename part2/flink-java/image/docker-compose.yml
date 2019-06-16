@@ -28,6 +28,6 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
       
 networks:
-  default:
-    external:
-      name: ps-net
+  ps-net:
+   external: true
+
