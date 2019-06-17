@@ -18,16 +18,16 @@
 
 package ps2019;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.cep.CEP;
+import org.apache.flink.cep.PatternSelectFunction;
 import org.apache.flink.cep.PatternStream;
-import org.apache.flink.cep.functions.PatternProcessFunction;
 import org.apache.flink.cep.pattern.Pattern;
-import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -35,15 +35,13 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
-import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.util.Collector;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -72,58 +70,51 @@ public class KafkaConsumer
 						new Tuple2<String, Double>(value1.f0, value1.f1 + value2.f1));
 	}
 
-	private static DataStream<String> idleTaxisQ3(DataStream<TaxiTrip> consumer){
+	private static SingleOutputStreamOperator<String> idleTaxisQ3(SingleOutputStreamOperator<TaxiTrip> consumer){
 
 		// Q3 - idle taxis
 		KeyedStream<TaxiTrip, String> TaxiStreamKeyed = consumer.keyBy((KeySelector<TaxiTrip, String>) value -> value.medallion);
-		// Pattern e1 -> e2 withing 1 hour
+
 		Pattern<TaxiTrip, ?> patternQ3 = Pattern.<TaxiTrip>begin("start").followedBy("end").within(Time.hours(1));
 
 		PatternStream<TaxiTrip> patternStreamKeyedQ3 = CEP.pattern(TaxiStreamKeyed, patternQ3);
 
 		//Pattern  e1 -> e2 - e1 car = e2 car - withing 1 hour
-		SingleOutputStreamOperator<Tuple2<String, Long>> idleTimes = patternStreamKeyedQ3.process(new PatternProcessFunction<TaxiTrip, Tuple2<String, Long>>() {
+		SingleOutputStreamOperator<Long> idleTimes = patternStreamKeyedQ3.select(new PatternSelectFunction<TaxiTrip, Long>() {
 			@Override
-			public void processMatch(Map<String
-					, List<TaxiTrip>> map
-					, Context context
-					, Collector<Tuple2<String, Long>> collector) {
-
-				TaxiTrip start = map.get("start").get(0);
-				TaxiTrip end = map.get("end").get(0);
-				if (start.medallion.equals(end.medallion)) { // Make sure start and end are the same car
-					collector.collect(new Tuple2<String, Long>(start.medallion, end.dropoff_datetime.getTime() - start.dropoff_datetime.getTime()));
-				}
+			public Long select(Map<String, List<TaxiTrip>> pattern) throws Exception {
+				TaxiTrip start = pattern.get("start").get(0);
+				TaxiTrip end = pattern.get("end").get(0);
+				// Make sure start and end are the same car
+				if(start.medallion.equals(end.medallion))
+					return end.pickup_datetime.getTime() - start.dropoff_datetime.getTime();
+				else
+					return 0L;
 			}
 		}).name("Pattern E1 -> E2 same medallion");
 
-		KeyedStream<Tuple2<String, Long>, String> keyedIdleTimes = idleTimes.keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0);
+		KeyedStream<Long, String> keyedIdleTimes = idleTimes.keyBy((KeySelector<Long, String>) value -> "Alert");
 
-		SingleOutputStreamOperator<Tuple2<String, Long>> idleTimesTotal = keyedIdleTimes.sum(1).name("Idle time total reduce");
+		SingleOutputStreamOperator<Long> idleTimesTotal = keyedIdleTimes.sum(0).name("Idle time total reduce");
 
-		Pattern<Tuple2<String, Long>, ?> patternAlert = Pattern.<Tuple2<String, Long>>begin("start").where(
-				new SimpleCondition<Tuple2<String, Long>>() {
-					@Override
-					public boolean filter(Tuple2<String, Long> event) {
-						return event.f1 >= Time.minutes(10).toMilliseconds();
-					}
-				}
-		);
-		PatternStream<Tuple2<String, Long>> idlePatterned = CEP.pattern(idleTimesTotal, patternAlert);
+		SingleOutputStreamOperator<Long> filteredAlerts = idleTimesTotal.filter(new FilterFunction<Long>() {
+			@Override
+			public boolean filter(Long value) throws Exception {
+				return value < Time.minutes(10).toMilliseconds();
+			}
+		}).name("Alert 10 minutes filter");
 
-		return idlePatterned.process(
-				new PatternProcessFunction<Tuple2<String, Long>, String>() {
-					@Override
-					public void processMatch(
-							Map<String, List<Tuple2<String, Long>>> pattern,
-							Context ctx,
-							Collector<String> out) {
-						out.collect("ALERT TIME IDLE BIGGER THAN 10 MINUTES IN THE LAST HOUR");
-					}
-				}).name("10 minutes alert collector");
+		SingleOutputStreamOperator<String> alertsIdle = filteredAlerts.map(new MapFunction<Long, String>() {
+			@Override
+			public String map(Long value) throws Exception {
+				return "ALERT TIME IDLE BIGGER THAN 10 MINUTES: " + value;
+			}
+		}).name("10 minutes alert map");
+
+		return alertsIdle;
 	}
 
-	private static SingleOutputStreamOperator<LinkedHashMap<String, Integer>> top10Routes(DataStream<TaxiTrip> consumer){
+	private static SingleOutputStreamOperator<Tuple2<String, Integer>> top10Routes(SingleOutputStreamOperator<TaxiTrip> consumer){
 
 		// Q1 - Top 10 frequent routes during 30 mins
 		DataStream<TaxiTrip> q2Gridded = consumer.map(new GridMap300());
@@ -135,7 +126,6 @@ public class KafkaConsumer
 				}
 		}).name("Map trips per route unique ID");
 
-
 		KeyedStream<Tuple2<String, Integer>, String> keyedRoutesQ2 = routesQ2.keyBy((KeySelector<Tuple2<String, Integer>, String>) value -> value.f0 );
 
 		SingleOutputStreamOperator<Tuple2<String, Integer>> reducedRoutesQ2 = keyedRoutesQ2.reduce(
@@ -146,31 +136,10 @@ public class KafkaConsumer
 		WindowedStream<Tuple2<String, Integer>, String, TimeWindow> keyedReducedRoutesQ2 = reducedRoutesQ2.keyBy((KeySelector<Tuple2<String, Integer>, String>) value -> value.f0)
 				.window(SlidingEventTimeWindows.of(Time.minutes(30), Time.seconds(5)));
 
-		return keyedReducedRoutesQ2.process(
-				new ProcessWindowFunction<Tuple2<String, Integer>, LinkedHashMap<String, Integer>, String, TimeWindow>(){
-
-					@Override
-					public void process(String key, Context context, Iterable<Tuple2<String, Integer>> input, Collector<LinkedHashMap<String, Integer>> out) {
-						TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>();
-
-						for (Tuple2<String, Integer> t: input) {
-							int count = 0;
-							if (sortedMap.containsKey(t.f0)) count = sortedMap.get(t.f0);
-							sortedMap.put(t.f0, count + t.f1);
-						}
-
-						LinkedHashMap<String, Integer> sortedTopN = sortedMap
-								.entrySet()
-								.stream()
-								.limit(10)
-								.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
-
-						out.collect(sortedTopN);
-					}
-				}).name("Top 10 sorted routes collector");
+		return keyedReducedRoutesQ2.max(1).name("Max route trips operator by window");
 	}
 
-	private static SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute(DataStream<TaxiTrip> consumer){
+	private static SingleOutputStreamOperator<Tuple2<String, Double>> tipsPerRoute(SingleOutputStreamOperator<TaxiTrip> consumer){
 		DataStream<TaxiTrip> q6Gridded = consumer.map(new GridMap300());
 
 		SingleOutputStreamOperator<Tuple2<String, Double>> routesQ6 = q6Gridded.map(new MapFunction<TaxiTrip, Tuple2<String, Double>> () {
@@ -183,7 +152,7 @@ public class KafkaConsumer
 		return reduceKeyDouble(routesQ6).name("Reduce tips per route");
 	}
 
-	private static SingleOutputStreamOperator<Tuple2<String, Double>> mostPleasentDriver(DataStream<TaxiTrip> consumer){
+	private static SingleOutputStreamOperator<Tuple2<String, Double>> mostPleasentDriver(SingleOutputStreamOperator<TaxiTrip> consumer){
 
 		// Q5 - Select most pleasant taxi driver
 		SingleOutputStreamOperator<Tuple2<String, Double>> driverTips = consumer.map(new MapFunction<TaxiTrip, Tuple2<String, Double>> () {
@@ -193,26 +162,13 @@ public class KafkaConsumer
 			}
 		}).name("Map tips by driver");
 
-		WindowedStream<Tuple2<String, Double>, String, TimeWindow> keyedReducedDriverTips = reduceKeyDouble(driverTips).name("Reduce tips by driver - window 24h").keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0)
-				.window(TumblingEventTimeWindows.of(Time.days(1)));
+		//window w cadency 24 minutes, changed to 10 minutes for fast results
+		WindowedStream<Tuple2<String, Double>, String, TimeWindow> keyedReducedDriverTips =
+				reduceKeyDouble(driverTips).name("Reduce tips by driver - window 24h")
+				.keyBy((KeySelector<Tuple2<String, Double>, String>) value -> value.f0)
+				.window(SlidingEventTimeWindows.of(Time.minutes(10), Time.minutes(10)));
 
-		return keyedReducedDriverTips.process(
-				new ProcessWindowFunction<Tuple2<String, Double>, Tuple2<String, Double>, String, TimeWindow>(){
-
-					@Override
-					public void process(String key, Context context, Iterable<Tuple2<String, Double>> input, Collector<Tuple2<String, Double>> out) {
-
-						Tuple2<String, Double> topDriver = new Tuple2<String, Double>("placeolder", Double.NEGATIVE_INFINITY);
-
-						for (Tuple2<String, Double> t: input) {
-							if(t.f1 >= topDriver.f1){
-								topDriver = t;
-							}
-						}
-
-						out.collect(topDriver);
-					}
-				}).name("Top driver collector");
+		return keyedReducedDriverTips.max(1).name("Max driver tips operator by window");
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -229,32 +185,33 @@ public class KafkaConsumer
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
 		Properties properties = new Properties();
-		properties.setProperty("bootstrap.servers", "localhost:9092");
+		properties.setProperty("bootstrap.servers", "localhost:9092,kafka:9092" );
 		properties.setProperty("group.id", "p2");
 
-		// Kafka consumer with event time and watermark of 30 seconds
+		// Kafka consumer with event time and watermark
 		DataStream<TaxiTrip> consumer = env
 				.addSource(new FlinkKafkaConsumer<>("debs", new DebsSchema(), properties));
-		consumer.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<TaxiTrip>(Time.seconds(30)) {
 
-								   @Override
-								   public long extractTimestamp(TaxiTrip element) {
-									   return element.dropoff_datetime.getTime();
-								   }
-		}).name("Kafka taxi trip consumer");
+		SingleOutputStreamOperator<TaxiTrip> consumerTimed = consumer.assignTimestampsAndWatermarks(new AscendingTimestampExtractor<TaxiTrip>() {
 
+			@Override
+			public long extractAscendingTimestamp(TaxiTrip element) {
+				return element.dropoff_datetime.getTime();
+			}
+
+		}).name("Kafka taxi trip consumer Watermarked");
 
 		// Q3 - Alert idle taxis when greater then 10 minutes
-		idleTaxisQ3(consumer).writeAsText("log/q3_idle_alerts.txt", FileSystem.WriteMode.OVERWRITE).name("Q3 - Idle time alerts");
+		idleTaxisQ3(consumerTimed).writeAsText("log/q3_idle_alerts.txt", FileSystem.WriteMode.OVERWRITE).name("Q3 - Idle time alerts");
 
 		// Q1 - Top 10 frequent routes during 30 minutes - Extra query for CEP purposes
-		top10Routes(consumer).writeAsText( "log/q1_most_frequent.txt", FileSystem.WriteMode.OVERWRITE).name("Q1 - Top 10 frequent routes");
+		top10Routes(consumerTimed).writeAsText( "log/q1_most_frequent.txt", FileSystem.WriteMode.OVERWRITE).name("Q1 - Top 10 frequent routes");
 
 		// Q6 - tips hall of fame
-		tipsPerRoute(consumer).writeAsText( "log/q6_route_tips.txt", FileSystem.WriteMode.OVERWRITE).name("Q6 - Tips hall of fame");
+		tipsPerRoute(consumerTimed).writeAsText( "log/q6_route_tips.txt", FileSystem.WriteMode.OVERWRITE).name("Q6 - Tips hall of fame");
 
 		// Q5 - most pleasant driver
-		mostPleasentDriver(consumer).writeAsText( "log/q5_pleasantDriver.txt", FileSystem.WriteMode.OVERWRITE).name("Q5 - Most pleasant driver");
+		mostPleasentDriver(consumerTimed).writeAsText( "log/q5_pleasantDriver.txt", FileSystem.WriteMode.OVERWRITE).name("Q5 - Most pleasant driver");
 
 		// execute program
 		env.execute("Streaming Taxi Trips");

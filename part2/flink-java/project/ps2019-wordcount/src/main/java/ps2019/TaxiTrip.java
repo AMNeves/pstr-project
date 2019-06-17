@@ -20,6 +20,7 @@ public class TaxiTrip {
         public String payment_type;
         public double fare_amount;
         public double surcharge;
+        public double mta_tax;
         public double tip_amount;
         public double tolls_amount;
         public double total_amount;
@@ -28,8 +29,8 @@ public class TaxiTrip {
 
         public static TaxiTrip fromString( String s ){
             String[] tokens = s.split( "," );
-            if(tokens.length != 15) throw new RuntimeException( "Invalid record: " + s );
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+            if(tokens.length != 17) throw new RuntimeException( "Invalid record: " + s + "length: " + tokens.length);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             int i = 0;
             try{
                 TaxiTrip trip = new TaxiTrip();
@@ -37,6 +38,7 @@ public class TaxiTrip {
                 trip.hack_license = tokens[++i];
                 trip.pickup_datetime = format.parse(tokens[++i]);
                 trip.dropoff_datetime = format.parse(tokens[++i]);
+
                 trip.trip_time_in_secs = Integer.parseInt(tokens[++i]);
                 trip.trip_distance = Double.parseDouble(tokens[++i]);
 
@@ -48,13 +50,14 @@ public class TaxiTrip {
                 trip.payment_type = tokens[++i];
                 trip.fare_amount = Double.parseDouble(tokens[++i]);
                 trip.surcharge = Double.parseDouble(tokens[++i]);
+                trip.mta_tax = Double.parseDouble(tokens[++i]);
                 trip.tip_amount = Double.parseDouble(tokens[++i]);
                 trip.tolls_amount = Double.parseDouble(tokens[++i]);
                 trip.total_amount = Double.parseDouble(tokens[++i]);
 
                 return trip;
             }catch(Exception e){
-                throw new RuntimeException("Invalid record: " + s);
+                throw new RuntimeException(e.getMessage());
             }
         }
 

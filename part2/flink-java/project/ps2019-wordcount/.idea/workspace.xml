@@ -2,15 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e5241a2-cdef-499e-8514-feef05673a16" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/test/java/ps2019/TaxiTripTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../image/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../image/log/q1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../image/log/q2.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../image/log/q3.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../image/log/q1_most_frequent.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q1_most_frequent.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../image/log/q6_route_tips.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q6_route_tips.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -21,43 +21,46 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="DefaultGradleProjectSettings">
-    <option name="testRunner" value="GRADLE" />
-    <option name="delegatedBuild" value="true" />
+    <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="35" column="55" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="55" />
+            <state relative-caret-position="222">
+              <caret line="154" selection-start-line="154" selection-end-line="154" />
               <folding>
+                <element signature="imports" expanded="true" />
                 <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
                 <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
                 <element signature="method#top10Routes#0;class#KafkaConsumer#0" />
                 <element signature="method#tipsPerRoute#0;class#KafkaConsumer#0" />
-                <element signature="method#mostPleasentDriver#0;class#KafkaConsumer#0" />
+                <element signature="e#9743#9920#0" expanded="true" />
+                <element signature="e#9919#9920#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="133" column="90" selection-start-line="133" selection-start-column="90" selection-end-line="133" selection-end-column="90" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="FindInProjectRecents">
     <findStrings>
       <find>maven.plugins</find>
       <find>window</find>
+      <find>\t</find>
     </findStrings>
+    <replaceStrings>
+      <replace>,</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
@@ -66,6 +69,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/test/java/ps2019/TaxiTripTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" />
         <option value="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" />
       </list>
     </option>
@@ -94,10 +99,10 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="260" />
-    <option name="y" value="20" />
-    <option name="width" value="1400" />
-    <option name="height" value="1000" />
+    <option name="x" value="329" />
+    <option name="y" value="234" />
+    <option name="width" value="974" />
+    <option name="height" value="1047" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -105,6 +110,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -138,12 +145,38 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="ps2019" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ps2019-wordcount" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ps2019-wordcount" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="ps2019" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -162,33 +195,89 @@
       </list>
     </option>
   </component>
+  <component name="RunManager">
+    <configuration name="TaxiTripTest.testTimestamp" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ps2019-wordcount" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ps2019.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ps2019" />
+      <option name="MAIN_CLASS_NAME" value="ps2019.TaxiTripTest" />
+      <option name="METHOD_NAME" value="testTimestamp" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.TaxiTripTest.testTimestamp" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 47m 12s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 48m 01s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 49m 39s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 49m 49s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 50m 04s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 50m 32s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 50m 56s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 51m 18s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 53m 21s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TaxiTripTest_testTimestamp - 2019.06.17 at 15h 53m 37s.xml">
+      <configuration name="TaxiTripTest.testTimestamp" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="Designer" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14232409" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11940298" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" weight="0.32936078" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.1375948" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Maven" visible="true" weight="0.15298508" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="3" visible="true" weight="0.123667374" />
+      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Palette&#9;" order="5" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,21 +286,58 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
+        <state relative-caret-position="537">
           <caret line="133" column="90" selection-start-line="133" selection-start-column="90" selection-end-line="133" selection-end-column="90" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_212/src.zip!/java/util/Date.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="883" column="16" selection-start-line="883" selection-start-column="16" selection-end-line="883" selection-end-column="16" />
+          <folding>
+            <element signature="e#37718#37719#0" expanded="true" />
+            <element signature="e#37754#37755#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-cep_2.11/1.8.0/flink-cep_2.11-1.8.0-sources.jar!/org/apache/flink/cep/PatternSelectFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/ps2019/TaxiTripTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="18" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="34" column="16" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="35" column="55" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="55" />
+        <state relative-caret-position="222">
+          <caret line="154" selection-start-line="154" selection-end-line="154" />
           <folding>
+            <element signature="imports" expanded="true" />
             <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
             <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
             <element signature="method#top10Routes#0;class#KafkaConsumer#0" />
             <element signature="method#tipsPerRoute#0;class#KafkaConsumer#0" />
-            <element signature="method#mostPleasentDriver#0;class#KafkaConsumer#0" />
+            <element signature="e#9743#9920#0" expanded="true" />
+            <element signature="e#9919#9920#0" expanded="true" />
           </folding>
         </state>
       </provider>
