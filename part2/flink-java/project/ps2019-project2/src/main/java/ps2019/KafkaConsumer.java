@@ -22,7 +22,6 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.cep.CEP;
@@ -36,9 +35,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -78,12 +75,12 @@ public class KafkaConsumer
 						new Tuple2<String, Double>(value1.f0, value1.f1 + value2.f1));
 	}
 
-	private static SingleOutputStreamOperator<Long> idleTaxisQ3(DataStream<TaxiTrip> consumer){
+	private static SingleOutputStreamOperator<String> idleTaxisQ3(DataStream<TaxiTrip> consumer){
 
 		// Q3 - idle taxis
 		KeyedStream<TaxiTrip, String> TaxiStreamKeyed = consumer.keyBy((KeySelector<TaxiTrip, String>) value -> value.medallion);
 
-		Pattern<TaxiTrip, ?> patternQ3 = Pattern.<TaxiTrip>begin("start").followedBy("end").within(Time.seconds(60));
+		Pattern<TaxiTrip, ?> patternQ3 = Pattern.<TaxiTrip>begin("start").followedByAny("end").within(Time.seconds(60));
 
 		PatternStream<TaxiTrip> patternStreamKeyedQ3 = CEP.pattern(TaxiStreamKeyed, patternQ3);
 
@@ -114,11 +111,11 @@ public class KafkaConsumer
 		SingleOutputStreamOperator<String> alertsIdle = filteredAlerts.map(new MapFunction<Long, String>() {
 			@Override
 			public String map(Long value) throws Exception {
-				return "ALERT TIME IDLE BIGGER THAN 10 MINUTES: " + value;
+				return "ALERT TIME IDLE BIGGER THAN 10 MINUTES: " + value/60000;
 			}
 		}).name("10 minutes alert map");
 
-		return filteredAlerts;
+		return alertsIdle;
 	}
 
 	private static SingleOutputStreamOperator<Tuple2<String, Integer>> top10Routes(DataStream<TaxiTrip> consumer){
@@ -148,7 +145,7 @@ public class KafkaConsumer
 					public Tuple2<String, Integer> reduce(Tuple2<String, Integer> value1, Tuple2<String, Integer> value2) throws Exception {
 						return new Tuple2<String, Integer>(value1.f0, value1.f1 + value2.f1);
 					}
-				});
+				}).name("Window reducer by key");
 
 		SingleOutputStreamOperator<Tuple2<String, Integer>> top10Routes = keyedReducedWindowRoutesQ2.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(30)))
 				.process(new ProcessAllWindowFunction<Tuple2<String, Integer>, Tuple2<String, Integer>, TimeWindow>() {
@@ -249,7 +246,7 @@ public class KafkaConsumer
 		// make parameters available in the web interface
 		env.getConfig().setGlobalJobParameters(params);
 
-		env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
+		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
 		Properties properties = new Properties();
 		properties.setProperty("bootstrap.servers", "localhost:9092,kafka:9092" );
