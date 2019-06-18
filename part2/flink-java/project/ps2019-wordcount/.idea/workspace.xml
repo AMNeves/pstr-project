@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" line="113" mnemonic="7" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="8e5241a2-cdef-499e-8514-feef05673a16" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/ps2019/TaxiTripTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../image/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../image/log/q1_most_frequent.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q1_most_frequent.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../image/log/q3_idle_alerts.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q3_idle_alerts.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../image/log/q5_pleasantDriver.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q5_pleasantDriver.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../image/log/q6_route_tips.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../image/log/q6_route_tips.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../../../kafka/publish-debs.bat" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -28,16 +30,23 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="222">
-              <caret line="154" selection-start-line="154" selection-end-line="154" />
+            <state relative-caret-position="44">
+              <caret line="202" column="119" selection-start-line="202" selection-start-column="119" selection-end-line="202" selection-end-column="119" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
                 <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
+                <element signature="e#3542#3552#0" expanded="true" />
                 <element signature="method#top10Routes#0;class#KafkaConsumer#0" />
+                <element signature="e#7119#7981#0" expanded="true" />
+                <element signature="e#7707#7708#0" expanded="true" />
+                <element signature="e#7755#7756#0" expanded="true" />
+                <element signature="e#7980#7981#0" expanded="true" />
                 <element signature="method#tipsPerRoute#0;class#KafkaConsumer#0" />
-                <element signature="e#9743#9920#0" expanded="true" />
-                <element signature="e#9919#9920#0" expanded="true" />
+                <element signature="method#mostPleasentDriver#0;class#KafkaConsumer#0" />
+                <element signature="e#10180#10625#0" expanded="true" />
+                <element signature="e#10817#10833#0" expanded="true" />
+                <element signature="e#10624#10625#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -57,6 +66,7 @@
       <find>maven.plugins</find>
       <find>window</find>
       <find>\t</find>
+      <find>tumbling</find>
     </findStrings>
     <replaceStrings>
       <replace>,</replace>
@@ -99,8 +109,7 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="329" />
-    <option name="y" value="234" />
+    <option name="x" value="647" />
     <option name="width" value="974" />
     <option name="height" value="1047" />
   </component>
@@ -111,7 +120,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -177,6 +185,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -256,14 +265,13 @@
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11940298" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09808102" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" weight="0.32936078" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.1375948" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.15059589" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -272,16 +280,29 @@
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Maven" order="3" visible="true" weight="0.123667374" />
+      <window_info anchor="right" id="Maven" order="3" visible="true" weight="0.07835821" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" id="Palette&#9;" order="5" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java</url>
+          <line>125</line>
+          <properties />
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pom.xml">
@@ -291,10 +312,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-cep_2.11/1.8.0/flink-cep_2.11-1.8.0-sources.jar!/org/apache/flink/cep/PatternSelectFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/DebsSchema.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="12" column="19" selection-start-line="12" selection-start-column="15" selection-end-line="12" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_212/src.zip!/java/util/Date.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="883" column="16" selection-start-line="883" selection-start-column="16" selection-end-line="883" selection-end-column="16" />
+        <state relative-caret-position="305">
+          <caret line="885" column="5" lean-forward="true" selection-start-line="885" selection-start-column="5" selection-end-line="885" selection-end-column="5" />
           <folding>
             <element signature="e#37718#37719#0" expanded="true" />
             <element signature="e#37754#37755#0" expanded="true" />
@@ -302,10 +344,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-cep_2.11/1.8.0/flink-cep_2.11-1.8.0-sources.jar!/org/apache/flink/cep/PatternSelectFunction.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-streaming-java_2.11/1.8.0/flink-streaming-java_2.11-1.8.0-sources.jar!/org/apache/flink/streaming/api/windowing/time/Time.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+        <state relative-caret-position="407">
+          <caret line="109" column="23" selection-start-line="109" selection-start-column="23" selection-end-line="109" selection-end-column="23" />
+          <folding>
+            <element signature="e#2202#2203#0" expanded="true" />
+            <element signature="e#2235#2236#0" expanded="true" />
+            <element signature="e#3493#3494#0" expanded="true" />
+            <element signature="e#3536#3537#0" expanded="true" />
+            <element signature="e#3661#3662#0" expanded="true" />
+            <element signature="e#3700#3701#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -319,25 +369,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/TaxiTrip.java">
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_212/src.zip!/java/lang/Integer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="34" column="16" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
+        <state relative-caret-position="253">
+          <caret line="1214" column="15" selection-start-line="1214" selection-start-column="15" selection-end-line="1214" selection-end-column="15" />
+          <folding>
+            <element signature="e#46394#46395#0" expanded="true" />
+            <element signature="e#46458#46459#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-streaming-java_2.11/1.8.0/flink-streaming-java_2.11-1.8.0-sources.jar!/org/apache/flink/streaming/api/datastream/KeyedStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="720" column="60" lean-forward="true" selection-start-line="720" selection-start-column="50" selection-end-line="720" selection-end-column="60" />
+          <folding>
+            <element signature="e#38962#38963#0" expanded="true" />
+            <element signature="e#39009#39010#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-streaming-java_2.11/1.8.0/flink-streaming-java_2.11-1.8.0-sources.jar!/org/apache/flink/streaming/api/datastream/AllWindowedStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="1377" column="41" selection-start-line="1377" selection-start-column="41" selection-end-line="1377" selection-end-column="41" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ps2019/KafkaConsumer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="154" selection-start-line="154" selection-end-line="154" />
+        <state relative-caret-position="44">
+          <caret line="202" column="119" selection-start-line="202" selection-start-column="119" selection-end-line="202" selection-end-column="119" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#reduceKeyDouble#0;class#KafkaConsumer#0" />
             <element signature="method#idleTaxisQ3#0;class#KafkaConsumer#0" />
+            <element signature="e#3542#3552#0" expanded="true" />
             <element signature="method#top10Routes#0;class#KafkaConsumer#0" />
+            <element signature="e#7119#7981#0" expanded="true" />
+            <element signature="e#7707#7708#0" expanded="true" />
+            <element signature="e#7755#7756#0" expanded="true" />
+            <element signature="e#7980#7981#0" expanded="true" />
             <element signature="method#tipsPerRoute#0;class#KafkaConsumer#0" />
-            <element signature="e#9743#9920#0" expanded="true" />
-            <element signature="e#9919#9920#0" expanded="true" />
+            <element signature="method#mostPleasentDriver#0;class#KafkaConsumer#0" />
+            <element signature="e#10180#10625#0" expanded="true" />
+            <element signature="e#10817#10833#0" expanded="true" />
+            <element signature="e#10624#10625#0" expanded="true" />
           </folding>
         </state>
       </provider>
